@@ -25,7 +25,7 @@ However, standard RNNs can struggle with long-term dependencies due to issues li
 - Enhanced Context Understanding: Captures more comprehensive information by considering data in both directions.
 - Improved Accuracy: Often outperforms unidirectional RNNs in tasks requiring detailed context analysis
 
-## 4. Building and Training a BiRNN Model
+## 3. Building and Training a BiRNN Model
 
 Implementation Example:
 ```
