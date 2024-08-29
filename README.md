@@ -182,8 +182,8 @@ Key Steps:
 - Inference: The BiRNN model processes the data and outputs a predicted price.
 - Response: The prediction is returned as a JSON response.
 
-Full Code Sample Model.py: https://github.com/0xtnpxsgt/Allora-Comprehensive-Guide/blob/main/birnn_model.py
-Full Code Sample App.py: https://github.com/0xtnpxsgt/Allora-Comprehensive-Guide/blob/main/app.py
+- Full Code Sample Model.py: https://github.com/0xtnpxsgt/Allora-Comprehensive-Guide/blob/main/birnn_model.py
+- Full Code Sample App.py: https://github.com/0xtnpxsgt/Allora-Comprehensive-Guide/blob/main/app.py
 
 ## Conclusion
 This guide covers the entire process of building, training, and deploying a BiRNN model for cryptocurrency price prediction. By following the steps outlined here, you can develop a robust model capable of making real-time predictions, potentially providing valuable insights into market trends.
