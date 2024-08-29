@@ -262,7 +262,7 @@ if __name__ == "__main__":
 docker compose up --build -d
 ```
 
-Your application is now ready to handle requests for real-time cryptocurrency price predictions.
+Your Allora Worker Node is now ready to handle requests for real-time cryptocurrency price predictions.
 
 
 
