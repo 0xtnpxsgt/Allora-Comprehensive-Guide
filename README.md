@@ -5,14 +5,10 @@
 Introduction
 Predicting cryptocurrency prices is notoriously difficult due to the market's volatile and dynamic nature. However, advances in deep learning, particularly in Recurrent Neural Networks (RNNs) and their variants like Bidirectional RNNs (BiRNNs), provide us with the tools to model these complex patterns. This guide will walk you through the principles and practical steps for building, training, and deploying a BiRNN model for cryptocurrency price prediction.
 
-Guide Outline:
-- Understanding Time Series Data
-- Introduction to Recurrent Neural Networks (RNNs)
-- What is a Bidirectional RNN (BiRNN)?
-- Building and Training a BiRNN Model
-- Integrating the Model with a Flask Application (app.py)
-- Fine-Tuning and Optimizing the Model
-- Deploying the Model for Real-Time Prediction
+
+Section 1: Understanding the BiRNN Model
+What is a BiRNN?
+A Bidirectional Recurrent Neural Network (BiRNN) is an extension of a standard Recurrent Neural Network (RNN) that processes data in both forward and backward directions. This allows the model to capture dependencies from both past and future states, making it particularly useful for time-series predictions like cryptocurrency prices.
 
 ## 1. Understanding Time Series Data
 Time series data consists of sequential data points collected or recorded at specific time intervals. For cryptocurrencies, this typically includes prices at regular intervals (e.g., every minute, hour, or day). Understanding key characteristics like trend, seasonality, and noise is crucial when building a predictive model.
@@ -24,8 +20,7 @@ RNNs are a type of neural network designed specifically to handle sequential dat
 - Sequential Processing: Processes data in order, considering the context provided by previous steps.
 However, standard RNNs can struggle with long-term dependencies due to issues like vanishing gradients, making them less effective for long sequences.
 
-## 3. What is a Bidirectional RNN (BiRNN)?
-BiRNNs extend the capability of standard RNNs by processing input sequences in both forward and backward directions. This approach enables the model to consider both past and future context, which is beneficial for tasks like price prediction where patterns can depend on both historical and subsequent data points.
+
 #### Benefits of BiRNNs:
 - Enhanced Context Understanding: Captures more comprehensive information by considering data in both directions.
 - Improved Accuracy: Often outperforms unidirectional RNNs in tasks requiring detailed context analysis
@@ -100,88 +95,175 @@ Example of Gradient Clipping:
 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 ```
 
-## 6. Training the BiRNN Model and Integrating it into Your Flask Application
-Once you've designed and fine-tuned your BiRNN model, the next steps involve training the model, saving it, and then integrating it into your Flask application for real-time predictions. Below is a step-by-step guide on how to accomplish this.
-#### 1. Training the BiRNN Model (model.py)
-First, ensure that you have set up your model.py with all the necessary components. Once that's ready, you can train the model by following these steps:
-```
-python model.py
-```
-During the training process, the model will learn from the historical data fetched from the Binance API, and the MinMaxScaler will normalize the data. After training, the model and the scaler will be saved for later use.
 
-#### 2. Saving the Trained Model and Scaler
-After training, the model and scaler are saved using the following commands in model.py:
+Section 2: Building the BiRNN Model
+
+1. Setting Up the Environment
+First, ensure you have all the necessary libraries installed. You'll need torch, pandas, sklearn, and requests for this project. Install them using pip:
 ```
-# Save the trained model
-torch.save(model.state_dict(), "birnn_model.pth")
-
-# Save the scaler used during training
-joblib.dump(scaler, "scaler.save")
-```
-These files will be used by your Flask app for making predictions without the need to retrain the model every time.
-
-#### 3. Integrating the Trained Model into app.py
-Now that your model is trained and saved, you can load it into your Flask application (app.py) to make predictions in real-time.
-
-Steps to Integrate:
-- Load the Model and Scaler in app.py:
-Modify app.py to load the saved model and scaler:
-```
-# Load the BiRNN model
-model = BiRNN(input_size=1, hidden_size=115, output_size=1, num_layers=2, dropout=0.3)
-model.load_state_dict(torch.load("birnn_model.pth"))
-model.eval()  # Set the model to evaluation mode
-
-# Load the saved scaler
-scaler = joblib.load("scaler.save")
+pip install torch pandas scikit-learn requests flask
 ```
 
-- Prepare Data for Inference:
-The data fetched from the Binance API should be preprocessed using the loaded scaler, similar to how it was done during training. This ensures consistency in data input to the model.
-
-Your Flask app is now ready to accept requests for cryptocurrency price predictions based on real-time data.
-Once the model is trained, we can integrate it into a Flask application for real-time inference. The app.py file handles incoming requests, processes the data, and returns predictions.
-
-## Setting Up the Flask Application
-We use Flask to create an API endpoint that accepts a cryptocurrency symbol (e.g., BTC, ETH) and returns a predicted price.
+2. Defining the BiRNN Model (model.py)
+Here's how you can define the BiRNN model:
 ```
-app.py Example:
-
 import torch
 import torch.nn as nn
 import pandas as pd
-from flask import Flask, Response, json
-from model import BiRNNModel
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+import joblib
+
+class BiRNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, num_layers, dropout):
+        super(BiRNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.rnn = nn.RNN(input_size, hidden_size, num_layers, dropout=dropout, batch_first=True, bidirectional=True)
+        self.fc = nn.Linear(hidden_size * 2, output_size)  # Multiply by 2 for bidirectional
+
+    def forward(self, x):
+        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size)  # Multiply by 2 for bidirectional
+        out, _ = self.rnn(x, h0)
+        out = self.fc(out[:, -1, :])
+        return out
+```
+
+Section 3: Training the BiRNN Model
+
+1. Fetching Data from Binance API
+Use the following function to fetch historical data for the tokens:
+
+```
+import requests
+
+def get_binance_data(symbols=["ETHUSDT", "BTCUSDT", "BNBUSDT", "SOLUSDT", "ARBUSDT"], interval="1m", limit=1000):
+    data_frames = {}
+    for symbol in symbols:
+        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+        response = requests.get(url)
+        data = response.json()
+        df = pd.DataFrame(data, columns=[
+            "open_time", "open", "high", "low", "close", "volume",
+            "close_time", "quote_asset_volume", "number_of_trades",
+            "taker_buy_base_asset_volume", "taker_buy_quote_asset_volume", "ignore"
+        ])
+        df["close"] = df["close"].astype(float)
+        data_frames[symbol] = df[["close"]]
+    return data_frames
+```
+
+2. Preparing Data for Training
+Prepare the data by scaling it:
+```
+data_frames = get_binance_data()
+scaler = MinMaxScaler(feature_range=(-1, 1))
+scaled_data = {symbol: scaler.fit_transform(df.values) for symbol, df in data_frames.items()}
+
+# Save the scaler for later use
+joblib.dump(scaler, "scaler.save")
+```
+
+3. Training the Model
+Train the BiRNN model using the following code:
+
+```
+model = BiRNN(input_size=1, hidden_size=115, output_size=1, num_layers=2, dropout=0.3)
+criterion = nn.MSELoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+num_epochs = 100
+
+for epoch in range(num_epochs):
+    for symbol, data in scaled_data.items():
+        seq = torch.FloatTensor(data).view(1, -1, 1)
+        labels = torch.FloatTensor(data[-1]).view(1, -1)
+        
+        optimizer.zero_grad()
+        y_pred = model(seq)
+        loss = criterion(y_pred, labels)
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        optimizer.step()
+
+# Save the model and scaler
+torch.save(model.state_dict(), "birnn_model.pth")
+```
+
+Section 4: Integrating the Model into the Flask Application
+
+1. Loading the Model and Scaler in app.py
+Modify your app.py to load the trained BiRNN model:
+```
+from flask import Flask, Response
+import torch
+import joblib
+import requests
+import pandas as pd
 
 app = Flask(__name__)
 
-# Load the pre-trained model
-model = BiRNNModel(input_size=1, hidden_layer_size=128, output_size=1, num_layers=2, dropout=0.3)
+class BiRNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, num_layers, dropout):
+        super(BiRNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.rnn = nn.RNN(input_size, hidden_size, num_layers, dropout=dropout, batch_first=True, bidirectional=True)
+        self.fc = nn.Linear(hidden_size * 2, output_size)
+
+    def forward(self, x):
+        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size)
+        out, _ = self.rnn(x, h0)
+        out = self.fc(out[:, -1, :])
+        return out
+
+model = BiRNN(input_size=1, hidden_size=115, output_size=1, num_layers=2, dropout=0.3)
 model.load_state_dict(torch.load("birnn_model.pth"))
 model.eval()
 
-# Function to fetch and preprocess data
-def get_binance_data(symbol):
-    # Fetch and preprocess Binance data
-    ...
+scaler = joblib.load("scaler.save")
+```
+
+2. Making Predictions
+```
+def get_binance_url(symbol="BTCUSDT", interval="1m", limit=1000):
+    return f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
 
 @app.route("/inference/<string:token>")
 def get_inference(token):
-    # Fetch data
-    data = get_binance_data(token)
+    token = token.upper()
+    url = get_binance_url(symbol=token + "USDT")
+    response = requests.get(url)
     
-    # Preprocess and predict
-    with torch.no_grad():
-        seq = torch.FloatTensor(data).view(1, -1, 1)
-        prediction = model(seq)
-    
-    # Return the prediction
-    return Response(str(prediction.item()), status=200, mimetype='application/json')
+    if response.status_code == 200:
+        data = response.json()
+        df = pd.DataFrame(data, columns=[
+            "open_time", "open", "high", "low", "close", "volume",
+            "close_time", "quote_asset_volume", "number_of_trades",
+            "taker_buy_base_asset_volume", "taker_buy_quote_asset_volume", "ignore"
+        ])
+        df["close"] = df["close"].astype(float)
+        scaled_data = scaler.transform(df["close"].values.reshape(-1, 1))
+        seq = torch.FloatTensor(scaled_data).view(1, -1, 1)
+        
+        with torch.no_grad():
+            y_pred = model(seq)
+        predicted_price = scaler.inverse_transform(y_pred.numpy())
+        return Response(str(round(predicted_price.item(), 2)), status=200, mimetype='application/json')
+    else:
+        return Response("Failed to retrieve data", status=500, mimetype='application/json')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8000)
-
 ```
+
+3. Running the Flask Application
+```
+docker compose up --build -d
+```
+
+Your application is now ready to handle requests for real-time cryptocurrency price predictions.
+
+
 
 Key Steps:
 - Model Loading: The pre-trained model is loaded into memory when the Flask app starts.
