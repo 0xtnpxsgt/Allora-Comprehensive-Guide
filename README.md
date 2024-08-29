@@ -100,39 +100,46 @@ Example of Gradient Clipping:
 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 ```
 
-## Saving the Model and Scaler
-Steps to Save the Model and Scaler:
-- Save the Trained Model: Use torch.save to save the model's state dictionary, which contains all the learned parameters.
+## 6. Training the BiRNN Model and Integrating it into Your Flask Application
+Once you've designed and fine-tuned your BiRNN model, the next steps involve training the model, saving it, and then integrating it into your Flask application for real-time predictions. Below is a step-by-step guide on how to accomplish this.
+#### 1. Training the BiRNN Model (model.py)
+First, ensure that you have set up your model.py with all the necessary components. Once that's ready, you can train the model by following these steps:
 ```
-torch.save(model.state_dict(), "birnn_model.pth")
+python model.py
 ```
-- Save the Scaler: Use joblib.dump to save the scaler used for data normalization. This is crucial because the same scaling must be applied during inference.
-```
-import joblib
+During the training process, the model will learn from the historical data fetched from the Binance API, and the MinMaxScaler will normalize the data. After training, the model and the scaler will be saved for later use.
 
+#### 2. Saving the Trained Model and Scaler
+After training, the model and scaler are saved using the following commands in model.py:
+```
+# Save the trained model
+torch.save(model.state_dict(), "birnn_model.pth")
+
+# Save the scaler used during training
 joblib.dump(scaler, "scaler.save")
 ```
+These files will be used by your Flask app for making predictions without the need to retrain the model every time.
 
-## Integrating Model Saving into the Training Loop
-Here's how to incorporate these steps into your training loop:
+#### 3. Integrating the Trained Model into app.py
+Now that your model is trained and saved, you can load it into your Flask application (app.py) to make predictions in real-time.
+
+Steps to Integrate:
+- Load the Model and Scaler in app.py:
+Modify app.py to load the saved model and scaler:
 ```
-# After training the model
-model.train()
-for epoch in range(num_epochs):
-    optimizer.zero_grad()
-    output = model(train_seq)
-    loss = criterion(output, train_labels)
-    loss.backward()
-    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)  # Gradient clipping
-    optimizer.step()
+# Load the BiRNN model
+model = BiRNN(input_size=1, hidden_size=115, output_size=1, num_layers=2, dropout=0.3)
+model.load_state_dict(torch.load("birnn_model.pth"))
+model.eval()  # Set the model to evaluation mode
 
-# Save the model and scaler
-torch.save(model.state_dict(), "birnn_model.pth")
-joblib.dump(scaler, "scaler.save")
+# Load the saved scaler
+scaler = joblib.load("scaler.save")
 ```
-By saving both the model and the scaler, you ensure that you can accurately reproduce the predictions during deployment, using the same preprocessing steps and model parameters that were used during training.
 
-## 6. Integrating the Model with a Flask Application (app.py)
+- Prepare Data for Inference:
+The data fetched from the Binance API should be preprocessed using the loaded scaler, similar to how it was done during training. This ensures consistency in data input to the model.
+
+Your Flask app is now ready to accept requests for cryptocurrency price predictions based on real-time data.
 Once the model is trained, we can integrate it into a Flask application for real-time inference. The app.py file handles incoming requests, processes the data, and returns predictions.
 
 ## Setting Up the Flask Application
