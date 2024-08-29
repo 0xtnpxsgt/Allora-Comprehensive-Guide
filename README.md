@@ -29,7 +29,7 @@ Benefits of BiRNNs:
 3. Building and Training a BiRNN Model
 
 Implementation Example:
-```
+```bash
 import torch
 import torch.nn as nn
 
@@ -52,7 +52,7 @@ Data is collected using the Binance API, providing historical price data for var
 - Feature Engineering: Creating features like moving averages or price changes that might help the model learn better.
 
 Fetching Data:
-```
+```bash
 def get_binance_data(symbols, interval="1m", limit=1000):
     # Function to fetch data from Binance
     ...
@@ -67,7 +67,7 @@ We train the BiRNN model using historical data. The training process involves:
 
 
 Training Example:
-```
+```bash
 model = BiRNNModel(input_size=1, hidden_layer_size=128, output_size=1, num_layers=2, dropout=0.3)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
@@ -92,7 +92,7 @@ To improve model performance, consider fine-tuning the following aspects:
 - Gradient Clipping: Prevents exploding gradients by capping the gradients during backpropagation.
 
 Example of Gradient Clipping:
-```
+```bash
 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 ```
 
@@ -101,13 +101,13 @@ torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
 1. Setting Up the Environment
 First, ensure you have all the necessary libraries installed. You'll need torch, pandas, sklearn, and requests for this project. Install them using pip:
-```
+```bash
 pip install torch pandas scikit-learn requests flask
 ```
 
 2. Defining the BiRNN Model (model.py)
 Here's how you can define the BiRNN model:
-```
+```bash
 import torch
 import torch.nn as nn
 import pandas as pd
@@ -156,7 +156,7 @@ def get_binance_data(symbols=["ETHUSDT", "BTCUSDT", "BNBUSDT", "SOLUSDT", "ARBUS
 
 2. Preparing Data for Training
 Prepare the data by scaling it:
-```
+```bash
 data_frames = get_binance_data()
 scaler = MinMaxScaler(feature_range=(-1, 1))
 scaled_data = {symbol: scaler.fit_transform(df.values) for symbol, df in data_frames.items()}
@@ -168,7 +168,7 @@ joblib.dump(scaler, "scaler.save")
 3. Training the Model
 Train the BiRNN model using the following code:
 
-```
+```bash
 model = BiRNN(input_size=1, hidden_size=115, output_size=1, num_layers=2, dropout=0.3)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -194,7 +194,7 @@ torch.save(model.state_dict(), "birnn_model.pth")
 
 1. Loading the Model and Scaler in app.py
 Modify your app.py to load the trained BiRNN model:
-```
+```bash
 from flask import Flask, Response
 import torch
 import joblib
@@ -225,7 +225,7 @@ scaler = joblib.load("scaler.save")
 ```
 
 2. Making Predictions
-```
+```bash
 def get_binance_url(symbol="BTCUSDT", interval="1m", limit=1000):
     return f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
 
@@ -258,7 +258,7 @@ if __name__ == "__main__":
 ```
 
 3. Build and Run Your Worker Node:
-```
+```bash
 docker compose up --build -d
 ```
 
