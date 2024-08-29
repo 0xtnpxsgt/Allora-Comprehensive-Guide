@@ -6,26 +6,27 @@ Introduction
 Predicting cryptocurrency prices is notoriously difficult due to the market's volatile and dynamic nature. However, advances in deep learning, particularly in Recurrent Neural Networks (RNNs) and their variants like Bidirectional RNNs (BiRNNs), provide us with the tools to model these complex patterns. This guide will walk you through the principles and practical steps for building, training, and deploying a BiRNN model for cryptocurrency price prediction.
 
 
-Section 1: Understanding the BiRNN Model
+## Section 1: Understanding the BiRNN Model
 What is a BiRNN?
 A Bidirectional Recurrent Neural Network (BiRNN) is an extension of a standard Recurrent Neural Network (RNN) that processes data in both forward and backward directions. This allows the model to capture dependencies from both past and future states, making it particularly useful for time-series predictions like cryptocurrency prices.
 
-## 1. Understanding Time Series Data
+1. Understanding Time Series Data
 Time series data consists of sequential data points collected or recorded at specific time intervals. For cryptocurrencies, this typically includes prices at regular intervals (e.g., every minute, hour, or day). Understanding key characteristics like trend, seasonality, and noise is crucial when building a predictive model.
 
-## 2. Introduction to Recurrent Neural Networks (RNNs)
+2. Introduction to Recurrent Neural Networks (RNNs)
 RNNs are a type of neural network designed specifically to handle sequential data. They are particularly useful for time series data because they can maintain a "memory" of previous inputs, allowing them to capture temporal dependencies.
-#### Key Features of RNNs:
+
+Key Features of RNNs:
 - Hidden State: Stores information from previous time steps.
 - Sequential Processing: Processes data in order, considering the context provided by previous steps.
 However, standard RNNs can struggle with long-term dependencies due to issues like vanishing gradients, making them less effective for long sequences.
 
 
-#### Benefits of BiRNNs:
+Benefits of BiRNNs:
 - Enhanced Context Understanding: Captures more comprehensive information by considering data in both directions.
 - Improved Accuracy: Often outperforms unidirectional RNNs in tasks requiring detailed context analysis
 
-## 3. Building and Training a BiRNN Model
+3. Building and Training a BiRNN Model
 
 Implementation Example:
 ```
@@ -45,12 +46,12 @@ class BiRNNModel(nn.Module):
         predictions = self.linear(rnn_out[:, -1])
         return predictions
 ```
-## Data Collection and Preprocessing
+Data Collection and Preprocessing
 Data is collected using the Binance API, providing historical price data for various cryptocurrencies. The data is then preprocessed, typically involving:
 - Scaling: Normalizing data using techniques like Min-Max Scaling.
 - Feature Engineering: Creating features like moving averages or price changes that might help the model learn better.
 
-## Fetching Data:
+Fetching Data:
 ```
 def get_binance_data(symbols, interval="1m", limit=1000):
     # Function to fetch data from Binance
@@ -58,14 +59,14 @@ def get_binance_data(symbols, interval="1m", limit=1000):
 
 ```
 
-## Training the Model
+Training the Model
 We train the BiRNN model using historical data. The training process involves:
 - Loss Function: Using Mean Squared Error (MSE) to quantify the prediction error.
 - Optimizer: Utilizing Adam or similar optimizers to minimize the loss function.
 - Training Loop: Iterating over the data, updating the model's parameters based on the gradients computed from the loss.
 
 
-## Training Example:
+Training Example:
 ```
 model = BiRNNModel(input_size=1, hidden_layer_size=128, output_size=1, num_layers=2, dropout=0.3)
 criterion = nn.MSELoss()
@@ -81,7 +82,7 @@ for epoch in range(num_epochs):
     optimizer.step()
 ```
 
-## 5. Fine-Tuning and Optimizing the Model
+5. Fine-Tuning and Optimizing the Model
 To improve model performance, consider fine-tuning the following aspects:
 
 - Hidden Layer Size: Adjust to capture more complex patterns.
@@ -96,7 +97,7 @@ torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 ```
 
 
-Section 2: Building the BiRNN Model
+## Section 2: Building the BiRNN Model
 
 1. Setting Up the Environment
 First, ensure you have all the necessary libraries installed. You'll need torch, pandas, sklearn, and requests for this project. Install them using pip:
@@ -129,7 +130,7 @@ class BiRNN(nn.Module):
         return out
 ```
 
-Section 3: Training the BiRNN Model
+## Section 3: Training the BiRNN Model
 
 1. Fetching Data from Binance API
 Use the following function to fetch historical data for the tokens:
@@ -189,7 +190,7 @@ for epoch in range(num_epochs):
 torch.save(model.state_dict(), "birnn_model.pth")
 ```
 
-Section 4: Integrating the Model into the Flask Application
+## Section 4: Integrating the Model into the Flask Application
 
 1. Loading the Model and Scaler in app.py
 Modify your app.py to load the trained BiRNN model:
