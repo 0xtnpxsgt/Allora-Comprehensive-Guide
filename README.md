@@ -1,4 +1,4 @@
-# Allora-Comprehensive-Guide
+# Allora: A Comprehensive Guide to Mastering Cryptocurrency Price Prediction with BiRNN
 "Mastering Cryptocurrency Price Prediction with BiRNN: A Comprehensive Guide from Model Creation to Real-Time Deployment"
 
 
