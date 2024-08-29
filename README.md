@@ -182,6 +182,8 @@ Key Steps:
 - Inference: The BiRNN model processes the data and outputs a predicted price.
 - Response: The prediction is returned as a JSON response.
 
+
+Full Code Sample:
 - Full Code Sample Model.py: https://github.com/0xtnpxsgt/Allora-Comprehensive-Guide/blob/main/birnn_model.py
 - Full Code Sample App.py: https://github.com/0xtnpxsgt/Allora-Comprehensive-Guide/blob/main/app.py
 
