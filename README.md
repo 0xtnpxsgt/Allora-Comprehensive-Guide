@@ -102,11 +102,11 @@ torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
 ## Saving the Model and Scaler
 Steps to Save the Model and Scaler:
-- 1. Save the Trained Model: Use torch.save to save the model's state dictionary, which contains all the learned parameters.
+- Save the Trained Model: Use torch.save to save the model's state dictionary, which contains all the learned parameters.
 ```
 torch.save(model.state_dict(), "birnn_model.pth")
 ```
-- 2.Save the Scaler: Use joblib.dump to save the scaler used for data normalization. This is crucial because the same scaling must be applied during inference.
+- Save the Scaler: Use joblib.dump to save the scaler used for data normalization. This is crucial because the same scaling must be applied during inference.
 ```
 import joblib
 
