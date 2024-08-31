@@ -10,15 +10,15 @@ CPU: Minimum of 1/2 core.
 Memory: 2 to 4 GB.
 Storage: SSD or NVMe with at least 5GB of space.
 ```
-
-# OPTION 1: One-Click Installation Script
+# How to Install?
+### OPTION 1: One-Click Installation Script
 Run Command:
 ```bash
 wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/alloraoneclickinstall.sh && chmod +x alloraoneclickinstall.sh && ./alloraoneclickinstall.sh
 ```
 
-
-# OPTION 2: Manual Installation Guide
+------------------------------------------------------------------------------------
+### OPTION 2: Manual Installation Guide
 
 # Prerequisites
 Before you start, ensure you have docker compose installed.
