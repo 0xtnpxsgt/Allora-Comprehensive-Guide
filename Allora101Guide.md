@@ -54,7 +54,7 @@ nano config.json
 ```
 
 ####  Edit addressKeyName & addressRestoreMnemonic / Copy & Paste Inside config.json
-#### Optional: RPC :  https://sentries-rpc.testnet-1.testnet.allora.network/
+#### Optional: RPC :  https://allora-rpc.testnet-1.testnet.allora.network/
 ```bash
 {
     "wallet": {
@@ -63,7 +63,7 @@ nano config.json
         "alloraHomeDir": "/root/.allorad",
         "gas": "1000000",
         "gasAdjustment": 1.0,
-        "nodeRpc": "https://allora-rpc.testnet-1.testnet.allora.network/",
+        "nodeRpc": "https://rpc.ankr.com/allora_testnet/",
         "maxRetries": 1,
         "delay": 1,
         "submitTx": false
@@ -139,97 +139,103 @@ chmod +x init.config
 nano app.py
 ```
 ```bash
-from flask import Flask, Response
-import requests
-import json
-import pandas as pd
 import torch
-import random
+import torch.nn as nn
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+import requests
+from flask import Flask, Response, json
 
-# create our Flask app
 app = Flask(__name__)
-        
-def get_simple_price(token):
-    base_url = "https://api.coingecko.com/api/v3/simple/price?ids="
-    token_map = {
-        'ETH': 'ethereum',
-        'SOL': 'solana',
-        'BTC': 'bitcoin',
-        'BNB': 'binancecoin',
-        'ARB': 'arbitrum'
-    }
-    token = token.upper()
-    if token in token_map:
-        url = f"{base_url}{token_map[token]}&vs_currencies=usd"
-        return url
-    else:
-        raise ValueError("Unsupported token") 
-               
-# define our endpoint
+
+# Define the BiRNN model with the correct architecture
+class BiRNNModel(nn.Module):
+    def __init__(self, input_size, hidden_layer_size, output_size, num_layers, dropout):
+        super(BiRNNModel, self).__init__()
+        self.hidden_layer_size = hidden_layer_size
+        self.num_layers = num_layers
+        self.rnn = nn.RNN(input_size, hidden_layer_size, num_layers=num_layers, dropout=dropout, batch_first=True, bidirectional=True)
+        self.linear = nn.Linear(hidden_layer_size * 2, output_size)  # *2 because of bidirectional
+
+    def forward(self, input_seq):
+        h_0 = torch.zeros(self.num_layers * 2, input_seq.size(0), self.hidden_layer_size)  # *2 for bidirection
+        rnn_out, _ = self.rnn(input_seq, h_0)
+        predictions = self.linear(rnn_out[:, -1])
+        return predictions
+
+# Initialize the model with the same architecture as during training
+model = BiRNNModel(input_size=1, hidden_layer_size=115, output_size=1, num_layers=2, dropout=0.3)
+model.load_state_dict(torch.load("birnn_model_optimized.pth", weights_only=True))
+model.eval()
+
+# Function to fetch historical data from Binance
+def get_binance_url(symbol="ETHUSDT", interval="1m", limit=1000):
+    return f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+
 @app.route("/inference/<string:token>")
 def get_inference(token):
+    if model is None:
+        return Response(json.dumps({"error": "Model is not available"}), status=500, mimetype='application/json')
 
-    try:
-      
-        url = get_simple_price(token)
-        headers = {
-          "accept": "application/json",
-          "x-cg-demo-api-key": "CG-XXXXXXXXXXXXXXXXXXXXXXXX" # replace with your API key
-        }
-    
-        response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-          data = response.json()
-          if token == 'BTC':
-            price1 = data["bitcoin"]["usd"]*1.02
-            price2 = data["bitcoin"]["usd"]*0.99
-          if token == 'ETH':
-            price1 = data["ethereum"]["usd"]*1.02
-            price2 = data["ethereum"]["usd"]*0.98
-          if token == 'SOL':
-            price1 = data["solana"]["usd"]*1.02
-            price2 = data["solana"]["usd"]*0.98
-          if token == 'BNB':
-            price1 = data["binancecoin"]["usd"]*1.02
-            price2 = data["binancecoin"]["usd"]*0.98
-          if token == 'ARB':
-            price1 = data["arbitrum"]["usd"]*1.02
-            price2 = data["arbitrum"]["usd"]*0.98
-          random_float = str(round(random.uniform(price1, price2), 2))
-        return random_float
-    except Exception as e:
-       # return Response(json.dumps({"pipeline error": str(e)}), status=500, mimetype='application/json')
-        url = get_simple_price(token)
-        headers = {
-          "accept": "application/json",
-          "x-cg-demo-api-key": "CG-XXXXXXXXXXXXXXXXXXXXXX # replace with your API key
-        }
-    
-        response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-          data = response.json()
-          if token == 'BTC':
-            price1 = data["bitcoin"]["usd"]*1.02
-            price2 = data["bitcoin"]["usd"]*0.98
-          if token == 'ETH':
-            price1 = data["ethereum"]["usd"]*1.02
-            price2 = data["ethereum"]["usd"]*0.98
-          if token == 'SOL':
-            price1 = data["solana"]["usd"]*1.02
-            price2 = data["solana"]["usd"]*0.98
-          if token == 'BNB':
-            price1 = data["binancecoin"]["usd"]*1.02
-            price2 = data["binancecoin"]["usd"]*0.98
-          if token == 'ARB':
-            price1 = data["arbitrum"]["usd"]*1.02
-            price2 = data["arbitrum"]["usd"]*0.98
-          random_float = str(round(random.uniform(price1, price2), 2))
-        return random_float
+    symbol_map = {
+        'ETH': 'ETHUSDT',
+        'BTC': 'BTCUSDT',
+        'BNB': 'BNBUSDT',
+        'SOL': 'SOLUSDT',
+        'ARB': 'ARBUSDT'
+    }
 
-    
-# run our Flask app
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    token = token.upper()
+    if token in symbol_map:
+        symbol = symbol_map[token]
+    else:
+        return Response(json.dumps({"error": "Unsupported token"}), status=400, mimetype='application/json')
+
+    url = get_binance_url(symbol=symbol)
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        df = pd.DataFrame(data, columns=[
+            "open_time", "open", "high", "low", "close", "volume",
+            "close_time", "quote_asset_volume", "number_of_trades",
+            "taker_buy_base_asset_volume", "taker_buy_quote_asset_volume", "ignore"
+        ])
+        df["close_time"] = pd.to_datetime(df["close_time"], unit='ms')
+        df = df[["close_time", "close"]]
+        df.columns = ["date", "price"]
+        df["price"] = df["price"].astype(float)
+
+        # Adjust the number of rows based on the symbol
+        if symbol in ['BTCUSDT', 'SOLUSDT']:
+            df = df.tail(10)  # Use last 10 minutes of data
+        else:
+            df = df.tail(20)  # Use last 20 minutes of data
+
+        # Prepare data for the BiRNN model
+        scaler = MinMaxScaler(feature_range=(-1, 1))
+        scaled_data = scaler.fit_transform(df['price'].values.reshape(-1, 1))
+
+        seq = torch.FloatTensor(scaled_data).view(1, -1, 1)
+
+        # Make prediction
+        with torch.no_grad():
+            y_pred = model(seq)
+
+        # Inverse transform the prediction to get the actual price
+        predicted_price = scaler.inverse_transform(y_pred.numpy())
+
+        # Round the predicted price to 2 decimal places
+        rounded_price = round(predicted_price.item(), 2)
+
+        # Return the rounded price as a string
+        return Response(str(rounded_price), status=200, mimetype='application/json')
+    else:
+        return Response(json.dumps({"error": "Failed to retrieve data from Binance API", "details": response.text}), 
+                        status=response.status_code, 
+                        mimetype='application/json')
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=8000)
 
 ```
 
@@ -247,18 +253,15 @@ pandas
 torch==2.0.1 
 python-dotenv
 requests==2.31.0
+scikit-learn==1.3.1
+numpy==1.25.2
+joblib==1.3.2
 ```
 ## Step 6: Build
 ```bash
 docker compose up --build -d
 ```
-
-HOW TO UPGRADE?
-```bash
-rm -rf upgrade-model.sh
-wget https://raw.githubusercontent.com/0xScraipa/0gx/main/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
-```
-
+-------------------------------------------------------------
 
 ## Check your wallet here: http://worker-tx.nodium.xyz/
 
