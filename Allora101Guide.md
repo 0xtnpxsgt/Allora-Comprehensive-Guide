@@ -141,10 +141,9 @@ chmod +x init.config
 wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
 ```
 
-wget https://raw.githubusercontent.com/0xScraipa/0gx/main/alloraoneclickinstall.sh && chmod +x alloraoneclickinstall.sh && ./alloraoneclickinstall.sh
 -------------------------------------------------------------
 
-## Check your wallet here: http://worker-tx.nodium.xyz/
+#### Check your wallet here: http://worker-tx.nodium.xyz/
 
 
 
