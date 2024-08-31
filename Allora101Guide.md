@@ -49,8 +49,10 @@ cd allora-huggingface-walkthrough
 ```
 ## Step 1-2: Run Script
 ```bash
-wget https://raw.githubusercontent.com/0xScraipa/0gx/main/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
+wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
 ```
+
+
 
 ## Step 2: 
 ```bash
