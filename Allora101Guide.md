@@ -2,15 +2,15 @@
 ![667ca11ef3c5440fdacd9c66_66464b1563777b5bd5e3ef02_allora-points-program-black](https://github.com/user-attachments/assets/fb524b13-49c1-4c8f-90d9-50a9be69130c)
 
 
-# How to Install?
-#### OPTION 1: One-Click Installation Script
+### How to Install?
+## OPTION 1: One-Click Installation Script
 Run Command:
 ```bash
 wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/alloraoneclickinstall.sh && chmod +x alloraoneclickinstall.sh && ./alloraoneclickinstall.sh
 ```
 
 ------------------------------------------------------------------------------------
-#### OPTION 2: Manual Installation Guide
+## OPTION 2: Manual Installation Guide
 
 # Prerequisites
 Before you start, ensure you have docker compose installed.
