@@ -47,12 +47,6 @@ cd $HOME && rm -rf allora-huggingface-walkthrough
 git clone https://github.com/allora-network/allora-huggingface-walkthrough
 cd allora-huggingface-walkthrough
 ```
-## Step 1-2: Run Script
-```bash
-wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
-```
-
-
 
 ## Step 2: 
 ```bash
@@ -140,10 +134,11 @@ chmod +x init.config
 ./init.config
 ```
 
-## Step 4: Build
+## Step 4: Run Script
 ```bash
-docker compose up --build -d
+wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
 ```
+
 -------------------------------------------------------------
 
 ## Check your wallet here: http://worker-tx.nodium.xyz/
