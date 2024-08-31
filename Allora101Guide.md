@@ -133,8 +133,6 @@ chmod +x init.config
 ./init.config
 ```
 ## Step 4: Edit App.py
-- Register on Coingecko https://www.coingecko.com/en/developers/dashboard & Create Demo API KEY
-- Copy & Replace API with your `UPSHOT API` -`COINGECKO API` , then save `Ctrl+X Y ENTER`.
 ```bash
 nano app.py
 ```
