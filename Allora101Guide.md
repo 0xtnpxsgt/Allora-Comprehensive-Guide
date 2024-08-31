@@ -1,4 +1,5 @@
 # Allora Guide 
+![667ca11ef3c5440fdacd9c66_66464b1563777b5bd5e3ef02_allora-points-program-black](https://github.com/user-attachments/assets/fb524b13-49c1-4c8f-90d9-50a9be69130c)
 
 - You must need to buy a VPS for running Allora Worker
 - You can buy from : Contabo
@@ -9,6 +10,16 @@ CPU: Minimum of 1/2 core.
 Memory: 2 to 4 GB.
 Storage: SSD or NVMe with at least 5GB of space.
 ```
+
+# OPTION 1: One-Click Installation Script
+Run Command:
+```bash
+wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/alloraoneclickinstall.sh && chmod +x alloraoneclickinstall.sh && ./alloraoneclickinstall.sh
+```
+
+
+# OPTION 2: Manual Installation Guide
+
 # Prerequisites
 Before you start, ensure you have docker compose installed.
 ```bash
@@ -138,6 +149,7 @@ chmod +x init.config
 wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
 ```
 
+wget https://raw.githubusercontent.com/0xScraipa/0gx/main/alloraoneclickinstall.sh && chmod +x alloraoneclickinstall.sh && ./alloraoneclickinstall.sh
 -------------------------------------------------------------
 
 ## Check your wallet here: http://worker-tx.nodium.xyz/
