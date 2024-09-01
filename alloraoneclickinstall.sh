@@ -52,7 +52,7 @@ cat > config.json <<EOL
     "wallet": {
         "addressKeyName": "test",
         "addressRestoreMnemonic": "<your mnemonic phrase>",
-        "alloraHomeDir": "/root/.allorad",
+        "alloraHomeDir": "",
         "gas": "1000000",
         "gasAdjustment": 1.0,
         "nodeRpc": "https://allora-rpc.testnet.allora.network/",
