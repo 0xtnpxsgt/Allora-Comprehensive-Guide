@@ -7,7 +7,7 @@ BRIGHT_GREEN="\033[1;32m"   # Bright Green for success messages
 MAGENTA="\033[1;35m"        # Magenta for titles
 RESET="\033[0m"             # Reset to default color
 
-echo -e "${LIGHT_BLUE}Upgrade Your Allora Model(Y/N):${RESET}"
+echo -e "${LIGHT_BLUE}Upgrade Your Allora Model(Type: Y):${RESET}"
 read -p "" installdep
 echo
 
@@ -17,9 +17,10 @@ if [[ "$installdep" =~ ^[Yy]$ ]]; then
     echo
     rm -rf app.py
     rm -rf requirements.txt
-    wget -q https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/app.py -O /root/allora-huggingface-walkthrough/app.py
-    wget -q https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/requirements.txt -O /root/allora-huggingface-walkthrough/requirements.txt
-    wget -q https://github.com/0xtnpxsgt/Allora-Comprehensive-Guide/raw/main/birnn_model_optimized.pth -O /root/allora-huggingface-walkthrough/birnn_model_optimized.pth
+    wget -q https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/XGBOOST/app.py -O /root/allora-huggingface-walkthrough/app.py
+    wget -q https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/XGBOOST/requirements.txt -O /root/allora-huggingface-walkthrough/requirements.txt
+    wget -q https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/XGBOOST/xgboost_model_tuned.json -O /root/allora-huggingface-walkthrough/xgboost_model_tuned.json
+    wget -q https://github.com/0xtnpxsgt/Allora-Comprehensive-Guide/raw/XGBOOST/scaler.save -O /root/allora-huggingface-walkthrough/scaler.save
     wait
 	
     echo -e "${LIGHT_BLUE}Rebuild and run a model :${RESET}"
