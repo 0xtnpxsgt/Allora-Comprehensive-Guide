@@ -8,7 +8,7 @@ Run Command:
 ```bash
 cd $HOME
 rm -rf alloraoneclickinstall.sh
-wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/alloraoneclickinstall.sh && chmod +x alloraoneclickinstall.sh && ./alloraoneclickinstall.sh
+wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/BiLSTM/alloraoneclickinstall.sh && chmod +x alloraoneclickinstall.sh && ./alloraoneclickinstall.sh
 ```
 
 ------------------------------------------------------------------------------------
