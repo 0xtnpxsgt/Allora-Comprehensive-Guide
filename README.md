@@ -68,7 +68,7 @@ nano config.json
         "alloraHomeDir": "/root/.allorad",
         "gas": "1000000",
         "gasAdjustment": 1.0,
-        "nodeRpc": "https://rpc.ankr.com/allora_testnet/",
+        "nodeRpc": "https://allora-rpc.testnet.allora.network/",
         "maxRetries": 1,
         "delay": 1,
         "submitTx": false
@@ -140,7 +140,7 @@ chmod +x init.config
 
 ## Step 4: Run Script
 ```bash
-wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/main/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
+wget https://raw.githubusercontent.com/0xtnpxsgt/Allora-Comprehensive-Guide/BiLSTM/upgrade-model.sh && chmod +x upgrade-model.sh && ./upgrade-model.sh
 ```
 
 -------------------------------------------------------------
